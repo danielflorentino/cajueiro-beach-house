@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotos do Imóvel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f5f0e6;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: #333333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .comodo {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .comodo h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .fotos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .fotos img {
+      width: 100%;
+      max-width: 280px;
+      height: auto;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .fotos img:hover {
+      transform: scale(1.05);
+    }
+
+    a.voltar {
+      display: block;
+      text-align: center;
+      margin-top: 40px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #555555;
+    }
+
+    a.voltar:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🏡 Fotos do Imóvel</h1>
+
+  <div class="comodo">
+    <h2>🛋️ Sala de Estar</h2>
+    <div class="fotos">
+      <img src="imagens/sala1.jpg" alt="Sala de Estar 1">
+      <img src="imagens/sala2.jpg" alt="Sala de Estar 2">
+    </div>
+  </div>
+
+  <div class="comodo">
+    <h2>🍽️ Cozinha</h2>
+    <div class="fotos">
+      <img src="imagens/cozinha1.jpg" alt="Cozinha 1">
+      <img src="imagens/cozinha2.jpg" alt="Cozinha 2">
+    </div>
+  </div>
+
+  <div class="comodo">
+    <h2>🛏️ Quarto</h2>
+    <div class="fotos">
+      <img src="imagens/quarto1.jpg" alt="Quarto 1">
+      <img src="imagens/quarto2.jpg" alt="Quarto 2">
+    </div>
+  </div>
+
+  <div class="comodo">
+    <h2>🚿 Banheiro</h2>
+    <div class="fotos">
+      <img src="imagens/banheiro1.jpg" alt="Banheiro 1">
+      <img src="imagens/banheiro2.jpg" alt="Banheiro 2">
+    </div>
+  </div>
+
+  <div class="comodo">
+    <h2>🌴 Área Externa</h2>
+    <div class="fotos">
+      <img src="imagens/externa1.jpg" alt="Área Externa 1">
+      <img src="imagens/externa2.jpg" alt="Área Externa 2">
+    </div>
+  </div>
+
+  <a href="index.html" class="voltar">← Voltar para a Página Inicial</a>
+
+</body>
+</html>
