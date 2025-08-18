@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Atalhos • Airbnb e Booking</title>
+  <!-- Font Awesome (ícones) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --sand:#f5f0e6;
+      --card:#ffffff;
+      --text:#333333;
+      --muted:#555555;
+      --border:#cccccc;
+      --shadow:0 4px 8px rgba(0,0,0,.08);
+      --shadow-hover:0 8px 16px rgba(0,0,0,.12);
+      --radius:14px;
+      --pad:18px 22px;
+    }
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      background:var(--sand);
+      font-family:"Helvetica Neue", Arial, sans-serif;
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .wrap{
+      width:100%;
+      max-width:520px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+    h1{
+      margin:0 0 6px 0;
+      text-align:center;
+      font-size:1.6rem;
+    }
+    p.sub{
+      margin:0 0 22px 0;
+      text-align:center;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+
+    .btn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      width:100%;
+      padding:var(--pad);
+      margin:10px 0;
+      background:#fff;
+      color:var(--text);
+      text-decoration:none;
+      border:2px solid var(--border);
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+      font-size:1.05rem;
+      font-weight:600;
+    }
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:var(--shadow-hover);
+      background:#eae4d6;
+    }
+    .btn i{
+      font-size:1.25rem;
+    }
+
+    .note{
+      margin-top:14px;
+      text-align:center;
+      font-size:.9rem;
+      color:var(--muted);
+    }
+
+    .back{
+      display:block;
+      text-align:center;
+      margin-top:20px;
+      color:var(--muted);
+      text-decoration:none;
+      font-weight:600;
+    }
+    .back:hover{ text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Atalhos de Reserva</h1>
+    <p class="sub">Escolha sua plataforma favorita</p>
+
+    <!-- Airbnb -->
+    <a class="btn"
+       href="https://www.airbnb.com/rooms/SEU_ID_AQUI"
+       target="_blank" rel="noopener noreferrer">
+      <i class="fa-brands fa-airbnb"></i>
+      Ver no Airbnb
+    </a>
+
+    <!-- Booking.com (usando ícone de hotel por não haver brand oficial no FA) -->
+    <a class="btn"
+       href="https://www.booking.com/hotel/SEU_SLUG_AQUI.html"
+       target="_blank" rel="noopener noreferrer">
+      <i class="fa-solid fa-hotel"></i>
+      Ver no Booking.com
+    </a>
+
+    <p class="note">Substitua os links acima pelo URL do seu anúncio no Airbnb e no Booking.</p>
+
+    <a class="back" href="index.html">← Voltar para a página inicial</a>
+  </main>
+</body>
+</html>
