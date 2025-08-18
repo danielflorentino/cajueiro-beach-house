@@ -3,15 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fotos do Imóvel</title>
+  <title>Galeria de Fotos</title>
+
+  <!-- Font Awesome para ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Lightbox2 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+
   <style>
     body {
       background-color: #f5f0e6;
       font-family: 'Helvetica Neue', Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      color: #333333;
+      color: #333;
     }
 
     h1 {
@@ -21,7 +27,6 @@
 
     .comodo {
       background-color: #ffffff;
-      border: 1px solid #ccc;
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 30px;
@@ -43,10 +48,10 @@
 
     .fotos img {
       width: 100%;
-      max-width: 280px;
-      height: auto;
+      max-width: 260px;
       border-radius: 8px;
       object-fit: cover;
+      cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       transition: transform 0.3s;
     }
@@ -61,7 +66,7 @@
       margin-top: 40px;
       text-decoration: none;
       font-size: 18px;
-      color: #555555;
+      color: #555;
     }
 
     a.voltar:hover {
@@ -71,79 +76,72 @@
 </head>
 <body>
 
-  <h1>🏡 Fotos do Imóvel</h1>
+  <h1>🏡 Galeria de Fotos do Imóvel</h1>
 
   <div class="comodo">
     <h2>🛋️ Sala de Estar</h2>
     <div class="fotos">
-      <img src="imagens/sala1.jpg" alt="Sala de Estar 1">
-      <img src="imagens/sala2.jpg" alt="Sala de Estar 2">
+      <a href="imagens/sala1.jpg" data-lightbox="sala" data-title="Sala de Estar 1">
+        <img src="imagens/sala1.jpg" alt="Sala de Estar 1">
+      </a>
+      <a href="imagens/sala2.jpg" data-lightbox="sala" data-title="Sala de Estar 2">
+        <img src="imagens/sala2.jpg" alt="Sala de Estar 2">
+      </a>
     </div>
   </div>
 
   <div class="comodo">
     <h2>🍽️ Cozinha</h2>
     <div class="fotos">
-      <img src="imagens/cozinha1.jpg" alt="Cozinha 1">
-      <img src="imagens/cozinha2.jpg" alt="Cozinha 2">
+      <a href="imagens/cozinha1.jpg" data-lightbox="cozinha" data-title="Cozinha 1">
+        <img src="imagens/cozinha1.jpg" alt="Cozinha 1">
+      </a>
+      <a href="imagens/cozinha2.jpg" data-lightbox="cozinha" data-title="Cozinha 2">
+        <img src="imagens/cozinha2.jpg" alt="Cozinha 2">
+      </a>
     </div>
   </div>
 
   <div class="comodo">
     <h2>🛏️ Quarto</h2>
     <div class="fotos">
-      <img src="imagens/quarto1.jpg" alt="Quarto 1">
-      <img src="imagens/quarto2.jpg" alt="Quarto 2">
-    </div>
-  </div>
-
-    <div class="comodo">
-    <h2>🛏️ Quarto 1 (Suíte)</h2>
-    <div class="fotos">
-      <img src="imagens/quarto1.jpg" alt="Quarto 1">
-      <img src="imagens/banheiro-quarto1.jpg" alt=" Banheiro do Quarto 1">
-    </div>
-  </div>
-
-    <div class="comodo">
-    <h2>🛏️ Quarto 2</h2>
-    <div class="fotos">
-      <img src="imagens/quarto2.jpg" alt="Quarto 2">
-    </div>
-  </div>
-
-    <div class="comodo">
-    <h2>🛏️ Quarto 3</h2>
-    <div class="fotos">
-      <img src="imagens/quarto3.jpg" alt="Quarto 3">
-    </div>
-  </div>
-
-    <div class="comodo">
-    <h2>🛏️ Quarto 4 (Suíte)</h2>
-    <div class="fotos">
-      <img src="imagens/quarto4.jpg" alt="Quarto 4">
-      <img src="imagens/banheiro-quarto4.jpg" alt=" Banheiro do Quarto 4">
+      <a href="imagens/quarto1.jpg" data-lightbox="quarto" data-title="Quarto 1">
+        <img src="imagens/quarto1.jpg" alt="Quarto 1">
+      </a>
+      <a href="imagens/quarto2.jpg" data-lightbox="quarto" data-title="Quarto 2">
+        <img src="imagens/quarto2.jpg" alt="Quarto 2">
+      </a>
     </div>
   </div>
 
   <div class="comodo">
-    <h2>🚿 Banheiro Social</h2>
+    <h2>🚿 Banheiro</h2>
     <div class="fotos">
-      <img src="imagens/banheiro1.jpg" alt="Banheiro 1">
-      <img src="imagens/banheiro2.jpg" alt="Banheiro 2">
+      <a href="imagens/banheiro1.jpg" data-lightbox="banheiro" data-title="Banheiro 1">
+        <img src="imagens/banheiro1.jpg" alt="Banheiro 1">
+      </a>
+      <a href="imagens/banheiro2.jpg" data-lightbox="banheiro" data-title="Banheiro 2">
+        <img src="imagens/banheiro2.jpg" alt="Banheiro 2">
+      </a>
     </div>
   </div>
 
   <div class="comodo">
     <h2>🌴 Área Externa</h2>
     <div class="fotos">
-      <img src="imagens/externa1.jpg" alt="Área Externa 1">
-      <img src="imagens/externa2.jpg" alt="Área Externa 2">
+      <a href="imagens/externa1.jpg" data-lightbox="externa" data-title="Área Externa 1">
+        <img src="imagens/externa1.jpg" alt="Área Externa 1">
+      </a>
+      <a href="imagens/externa2.jpg" data-lightbox="externa" data-title="Área Externa 2">
+        <img src="imagens/externa2.jpg" alt="Área Externa 2">
+      </a>
     </div>
   </div>
 
   <a href="index.html" class="voltar">← Voltar para a Página Inicial</a>
 
+  <!-- Lightbox2 JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox-plus-jquery.min.js"></script>
 </body>
 </html>
+
