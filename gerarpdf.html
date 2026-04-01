@@ -24,16 +24,42 @@ async function gerarPDF() {
     const documentoBase64 = await fileToBase64(documentoFile);
     const comprovanteBase64 = await fileToBase64(comprovanteFile);
 
-    let y = 10;
+    const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
+    const margin = 15;
     const lineHeight = 6;
-    const margin = 10;
+    let y = margin;
+    let pageNum = 1;
 
+    const dataGeracao = new Date().toLocaleDateString('pt-BR');
+
+    function addFooter() {
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "italic");
+        doc.text(`Página ${pageNum} - Gerado em ${dataGeracao}`, pageWidth - margin, pageHeight - 10, {align: 'right'});
+        pageNum++;
+    }
+
+    // --- CAPA COM MARCA D’ÁGUA ---
+    doc.setFontSize(40);
+    doc.setTextColor(200,200,200);
+    doc.text("CONTRATO", pageWidth/2, pageHeight/2, {align: "center", angle: 45});
+    doc.setFontSize(22);
+    doc.setTextColor(0,0,0);
+    doc.setFont("helvetica", "bold");
+    doc.text("CONTRATO DE LOCAÇÃO POR TEMPORADA", pageWidth/2, pageHeight/2 - 20, {align: "center"});
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text("Daniel Florentino de Lima", pageWidth/2, pageHeight/2, {align: "center"});
+    addFooter();
+    doc.addPage();
+    y = margin;
+
+    // --- TEXTO PRINCIPAL ---
     doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
 
-    const contrato = `
-CONTRATO DE LOCAÇÃO POR TEMPORADA
-
+    const contratoTexto = `
 LOCADOR(A): Daniel Florentino de Lima, CPF nº 103.393.774-61, residente em Rua Professora Anunciada da Rocha Melo, 57, Apt 201, Madalena, CEP: 50710-390, Recife-PE.
 
 LOCATÁRIO: ${nome}
@@ -66,21 +92,44 @@ CLÁUSULA 3 – LIMPEZA E ORGANIZAÇÃO
 - Desocupar geladeira e freezer antes do check-out
 - Limpar a grelha da churrasqueira após o uso e descartar corretamente as cinzas
 3.3 O descumprimento da limpeza da churrasqueira implicará multa de R$ 50,00
+`;
 
-CLÁUSULA 4 – DANOS AO IMÓVEL
-4.1 Qualquer dano ao imóvel, móveis ou eletrodomésticos deverá ser comunicado imediatamente ao LOCADOR.
-4.2 O LOCATÁRIO será responsável por ressarcir quaisquer danos causados durante sua estadia.
+    const lines = doc.splitTextToSize(contratoTexto, pageWidth - 2*margin);
+    lines.forEach(line => {
+        if (y + lineHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
+        doc.text(line, margin, y);
+        y += lineHeight;
+    });
 
-CLÁUSULA 5 – USO DO ENXOVAL
-5.1 O LOCATÁRIO compromete-se a zelar pelo enxoval (roupas de cama e banho).
-5.2 Recomenda-se evitar o uso de toalhas e lençóis com resíduos de maquiagem, protetor solar, bronzeadores ou similares.
-5.3 Em caso de danos permanentes, extravio ou ausência, serão cobrados valores de reposição conforme tabela.
-Lençol de Cama (Com ou sem Elático): R$50,00
-Fronha: R$ 20,00
-Toalha de Banho: R$50,00
-Toalha de Rosto: R$30,00
-Toalha de piso: R$30,00
-Chave/Tag: R$150,00
+    // --- TABELA DE ENXOVAL ---
+    y += 5;
+    if (y + 70 > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
+    doc.setFont("helvetica", "bold");
+    doc.text("Tabela de Reposição de Enxoval", margin, y);
+    y += lineHeight;
+    doc.setFont("helvetica", "normal");
+
+    const enxoval = [
+        ["Item", "Valor (R$)"],
+        ["Lençol de Cama (Com ou sem Elástico)", "50,00"],
+        ["Fronha", "20,00"],
+        ["Toalha de Banho", "50,00"],
+        ["Toalha de Rosto", "30,00"],
+        ["Toalha de Piso", "30,00"],
+        ["Chave/Tag", "150,00"]
+    ];
+
+    const col1Width = 120;
+    const col2Width = 40;
+    enxoval.forEach((row, index) => {
+        if (y + lineHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
+        doc.text(row[0], margin, y);
+        doc.text(row[1], margin + col1Width + 10, y);
+        y += lineHeight;
+    });
+
+    // --- CLÁUSULAS FINAIS ---
+    const clausulasFinais = `
 5.4 Danos ao colchão ou capa impermeável implicam custos de limpeza ou substituição.
 
 CLÁUSULA 6 – REGRAS DE USO DO IMÓVEL
@@ -104,40 +153,39 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
 8.1 O presente contrato deverá ser assinado digitalmente por LOCADOR e LOCATÁRIO através da ferramenta GOV.
 8.2 O LOCATÁRIO declara estar ciente e de acordo com todas as regras aqui estabelecidas.
 8.3 O descumprimento das cláusulas poderá implicar em cobranças adicionais, multas ou encerramento da locação.
-
-Local e Data: ___________________________
-
-LOCADOR: ___________________________
-
-LOCATÁRIO: ___________________________
 `;
 
-    const lines = doc.splitTextToSize(contrato, 180);
-    for (let i = 0; i < lines.length; i++) {
-        if (y + lineHeight > pageHeight - margin) {
-            doc.addPage();
-            y = margin;
-        }
-        doc.text(lines[i], 10, y);
+    const clausulasLines = doc.splitTextToSize(clausulasFinais, pageWidth - 2*margin);
+    clausulasLines.forEach(line => {
+        if (y + lineHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
+        doc.text(line, margin, y);
         y += lineHeight;
-    }
+    });
 
-    // Adicionar imagens dos arquivos com quebra de página se necessário
+    // --- IMAGENS PROPORCIONAIS ---
+    y += 10;
+    const imageMaxHeight = 60;
+    const imageWidth = 80;
+    if (y + imageMaxHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
     doc.setFontSize(10);
-    if (y + 65 > pageHeight - margin) { // 60 altura da imagem + 5 de margem
-        doc.addPage();
-        y = margin;
-    }
-    doc.text("Documento com Foto:", 10, y);
-    doc.addImage(documentoBase64, 'JPEG', 10, y + 5, 80, 60);
+    doc.text("Documento com Foto:", margin, y);
+    doc.addImage(documentoBase64, 'JPEG', margin, y + 5, imageWidth, imageMaxHeight);
 
-    if (y + 65 > pageHeight - margin) {
-        doc.addPage();
-        y = margin;
-    }
-    doc.text("Comprovante de Residência:", 10, y + 70);
-    doc.addImage(comprovanteBase64, 'JPEG', 10, y + 75, 80, 60);
+    doc.text("Comprovante de Residência:", pageWidth/2 + 10, y);
+    doc.addImage(comprovanteBase64, 'JPEG', pageWidth/2 + 10, y + 5, imageWidth, imageMaxHeight);
 
-    doc.save('Contrato_Locacao.pdf');
+    y += imageMaxHeight + 30;
+
+    // --- ASSINATURAS COM LINHAS ---
+    if (y + 60 > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
+    doc.setFontSize(12);
+    doc.text("Local e Data: ___________________________", margin, y);
+    y += lineHeight*2;
+    doc.text("LOCADOR: ___________________________", margin, y);
+    y += lineHeight*2;
+    doc.text("LOCATÁRIO: ___________________________", margin, y);
+
+    addFooter();
+    doc.save('Contrato_Locacao_Premium.pdf');
 }
 </script>
