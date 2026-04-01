@@ -1,148 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contrato de Locação</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f7f7f7;
-        }
-        h1 {
-            text-align: center;
-        }
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 600px;
-            margin: auto;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        input[type="file"] {
-            padding: 3px;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 15px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrato de Locação</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background-color: #f7f7f7; }
+h1 { text-align: center; }
+form { background-color: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+label { display: block; margin-top: 10px; font-weight: bold; }
+input { width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; }
+input[type="file"] { padding: 3px; }
+button { margin-top: 20px; padding: 10px 15px; border: none; background-color: #007BFF; color: white; border-radius: 5px; cursor: pointer; }
+button:hover { background-color: #0056b3; }
+</style>
 </head>
 <body>
-    <h1>Contrato de Locação - Cajueiro Beach House </h1>
-    <form id="rentalForm">
-        <label for="nome">Nome Completo do Locatário:</label>
-        <input type="text" id="nome" name="nome" required>
+<h1>Contrato de Locação - Cajueiro Beach House </h1>
+<form id="rentalForm">
+    <label for="nome">Nome Completo do Locatário:</label>
+    <input type="text" id="nome" name="nome" required>
+    <label for="endereco">Endereço Residencial do Locatário:</label>
+    <input type="text" id="endereco" name="endereco" required>
+    <label for="telefone">Telefone:</label>
+    <input type="text" id="telefone" name="telefone" required>
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" name="email" required>
+    <label for="checkin">Data de Check-in:</label>
+    <input type="date" id="checkin" name="checkin" required>
+    <label for="checkout">Data de Check-out:</label>
+    <input type="date" id="checkout" name="checkout" required>
+    <label for="documento">Documento com Foto (JPG/PNG):</label>
+    <input type="file" id="documento" name="documento" accept=".jpg, .jpeg, .png" required>
+    <label for="comprovante">Comprovante de Residência (JPG/PNG):</label>
+    <input type="file" id="comprovante" name="comprovante" accept=".jpg, .jpeg, .png" required>
+    <button type="button" onclick="gerarPDF()">Gerar Contrato em PDF</button>
+</form>
 
-        <label for="endereco">Endereço Residencial do Locatário:</label>
-        <input type="text" id="endereco" name="endereco" required>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+async function gerarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-        <label for="telefone">Telefone:</label>
-        <input type="text" id="telefone" name="telefone" required>
+    const nome = document.getElementById('nome').value;
+    const endereco = document.getElementById('endereco').value;
+    const telefone = document.getElementById('telefone').value;
+    const email = document.getElementById('email').value;
+    const checkin = document.getElementById('checkin').value;
+    const checkout = document.getElementById('checkout').value;
+    const documentoFile = document.getElementById('documento').files[0];
+    const comprovanteFile = document.getElementById('comprovante').files[0];
 
-        <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required>
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
 
-        <label for="checkin">Data de Check-in:</label>
-        <input type="date" id="checkin" name="checkin" required>
+    const documentoBase64 = await fileToBase64(documentoFile);
+    const comprovanteBase64 = await fileToBase64(comprovanteFile);
 
-        <label for="checkout">Data de Check-out:</label>
-        <input type="date" id="checkout" name="checkout" required>
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 15;
+    const lineHeight = 6;
+    let y = margin;
+    let pageNum = 1;
+    const fontSize = 12; 
+    const dataGeracao = new Date().toLocaleDateString('pt-BR');
 
-        <label for="documento">Documento com Foto (JPG/PNG):</label>
-        <input type="file" id="documento" name="documento" accept=".jpg, .jpeg, .png" required>
+    function addFooter() {
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "italic");
+        doc.text(`Página ${pageNum} - Gerado em ${dataGeracao}`, pageWidth - margin, pageHeight - 10, {align: 'right'});
+        pageNum++;
+    }
 
-        <label for="comprovante">Comprovante de Residência (JPG/PNG):</label>
-        <input type="file" id="comprovante" name="comprovante" accept=".jpg, .jpeg, .png" required>
+    // --- CAPA ---
+    doc.setFontSize(40);
+    doc.setTextColor(200,200,200);
+    doc.text("CONTRATO", pageWidth/2, pageHeight/2, {align: "center", angle: 45});
+    doc.setFontSize(22);
+    doc.setTextColor(0,0,0);
+    doc.setFont("helvetica", "bold");
+    doc.text("CONTRATO DE LOCAÇÃO POR TEMPORADA", pageWidth/2, pageHeight/2 - 20, {align: "center"});
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text("Cajueiro Beach House", pageWidth/2, pageHeight/2, {align: "center"});
+    addFooter();
+    doc.addPage();
+    y = margin;
 
-        <button type="button" onclick="gerarPDF()">Gerar Contrato em PDF</button>
-    </form>
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(fontSize);
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
-    async function gerarPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        const nome = document.getElementById('nome').value;
-        const endereco = document.getElementById('endereco').value;
-        const telefone = document.getElementById('telefone').value;
-        const email = document.getElementById('email').value;
-        const checkin = document.getElementById('checkin').value;
-        const checkout = document.getElementById('checkout').value;
-        const documentoFile = document.getElementById('documento').files[0];
-        const comprovanteFile = document.getElementById('comprovante').files[0];
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        const documentoBase64 = await fileToBase64(documentoFile);
-        const comprovanteBase64 = await fileToBase64(comprovanteFile);
-
-        const pageWidth = doc.internal.pageSize.width;
-        const pageHeight = doc.internal.pageSize.height;
-        const margin = 15;
-        const lineHeight = 6;
-        let y = margin;
-        let pageNum = 1;
-        const fontSize = 12; // Padroniza fonte
-        const dataGeracao = new Date().toLocaleDateString('pt-BR');
-
-        function addFooter() {
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "italic");
-            doc.text(`Página ${pageNum} - Gerado em ${dataGeracao}`, pageWidth - margin, pageHeight - 10, {align: 'right'});
-            pageNum++;
-        }
-
-        // --- CAPA COM MARCA D’ÁGUA ---
-        doc.setFontSize(40);
-        doc.setTextColor(200,200,200);
-        doc.text("CONTRATO", pageWidth/2, pageHeight/2, {align: "center", angle: 45});
-        doc.setFontSize(22);
-        doc.setTextColor(0,0,0);
-        doc.setFont("helvetica", "bold");
-        doc.text("CONTRATO DE LOCAÇÃO POR TEMPORADA", pageWidth/2, pageHeight/2 - 20, {align: "center"});
-        doc.setFontSize(14);
-        doc.setFont("helvetica", "normal");
-        doc.text("Cajueiro Beach House", pageWidth/2, pageHeight/2, {align: "center"});
-        addFooter();
-        doc.addPage();
-        y = margin;
-
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(fontSize);
-
-        // --- TEXTO PRINCIPAL COM CLÁUSULAS ---
-        const contratoTexto = `
+    // --- TEXTO COMPLETO DO CONTRATO ---
+    const contratoTexto = `
 LOCADOR(A): Daniel Florentino de Lima, CPF nº 103.393.774-61, residente em Rua Professora Anunciada da Rocha Melo, 57, Apt 201, Madalena, CEP: 50710-390, Recife-PE.
 
 LOCATÁRIO: ${nome}
@@ -179,49 +136,14 @@ CLÁUSULA 3 – LIMPEZA E ORGANIZAÇÃO
 CLÁUSULA 4 – DANOS AO IMÓVEL
 4.1 Qualquer dano ao imóvel, móveis ou eletrodomésticos deverá ser comunicado imediatamente ao LOCADOR.
 4.2 O LOCATÁRIO será responsável por ressarcir quaisquer danos causados durante sua estadia.
-`;
 
-        let lines = doc.splitTextToSize(contratoTexto, pageWidth - 2*margin);
-        lines.forEach(line => {
-            if (y + lineHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
-            doc.text(line, margin, y);
-            y += lineHeight;
-        });
-
-        // --- TABELA DE ENXOVAL ---
-        y += 5;
-        const enxoval = [
-            ["Item", "Valor (R$)"],
-            ["Lençol de Cama (Com ou sem Elástico)", "50,00"],
-            ["Fronha", "20,00"],
-            ["Toalha de Banho", "50,00"],
-            ["Toalha de Rosto", "30,00"],
-            ["Toalha de Piso", "30,00"],
-            ["Chave/Tag", "150,00"]
-        ];
-        const col1Width = 120;
-        const col2Width = 40;
-
-        doc.setFont("helvetica", "bold");
-        doc.text("Tabela de Reposição de Enxoval", margin, y);
-        y += lineHeight;
-        doc.setFont("helvetica", "normal");
-
-        enxoval.forEach((row, index) => {
-            if (y + lineHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
-            doc.text(row[0], margin, y);
-            doc.text(row[1], margin + col1Width + 10, y);
-            y += lineHeight;
-        });
-
-        // --- CLÁUSULAS FINAIS ---
-        const clausulasFinais = `
+CLÁUSULA 5 – DANOS AO COLCHÃO
 5.4 Danos ao colchão ou capa impermeável implicam custos de limpeza ou substituição.
 
 CLÁUSULA 6 – REGRAS DE USO DO IMÓVEL
 6.1 É proibido:
 - Retirar itens da acomodação para uso externo à acomodação.
-- Permanência no imovel em número de hospedes superior à locação, em caso de visitas, informar ao LOCATÁRIO.
+- Permanência no imóvel em número de hospedes superior à locação, em caso de visitas, informar ao LOCATÁRIO.
 - Acessar móveis identificados como “Uso Exclusivo do Anfitrião” sem autorização.
 6.2 Descumprimento implicará multa e ressarcimento por danos.
 
@@ -242,52 +164,88 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
 8.3 O descumprimento das cláusulas poderá implicar em cobranças adicionais, multas ou encerramento da locação.
 `;
 
+    let contratoLines = doc.splitTextToSize(contratoTexto, pageWidth - 2*margin);
+    contratoLines.forEach(line => {
+        if(y + lineHeight > pageHeight - margin){ addFooter(); doc.addPage(); y = margin; }
+        doc.text(line, margin, y);
+        y += lineHeight;
+    });
 
-let lines = doc.splitTextToSize(clausulasFinais, pageWidth - 2*margin);
-        lines.forEach(line => {
-            if (y + lineHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
-            doc.text(line, margin, y);
-            y += lineHeight;
-        });
+    // --- TABELA DE ENXOVAL ESTILIZADA ---
+    y += 10;
+    const enxoval = [
+        ["Item", "Valor (R$)"],
+        ["Lençol de Cama (Com ou sem Elástico)", "50,00"],
+        ["Fronha", "20,00"],
+        ["Toalha de Banho", "50,00"],
+        ["Toalha de Rosto", "30,00"],
+        ["Toalha de Piso", "30,00"],
+        ["Chave/Tag", "150,00"]
+    ];
 
+    const colWidths = [120, 40];
+    const tableHeight = lineHeight;
 
-        // --- IMAGENS PROPORCIONAIS ---
-        y += 10;
-        const maxImgWidth = 80;
-        const maxImgHeight = 60;
+    doc.setFont("helvetica", "bold");
+    doc.text("Tabela de Reposição de Enxoval", margin, y);
+    y += lineHeight;
+    doc.setFont("helvetica", "normal");
 
-        function addImageProportional(base64, x, y, maxWidth, maxHeight) {
+    // Desenha a tabela
+    enxoval.forEach((row, rowIndex) => {
+        if(y + tableHeight > pageHeight - margin){ addFooter(); doc.addPage(); y = margin; }
+        // Linha da tabela
+        doc.rect(margin, y - 4, colWidths[0]+colWidths[1]+10, tableHeight); 
+        // Colunas
+        doc.rect(margin, y - 4, colWidths[0], tableHeight);
+        doc.rect(margin + colWidths[0], y - 4, colWidths[1], tableHeight);
+
+        // Texto das células
+        doc.text(row[0], margin + 2, y);
+        doc.text(row[1], margin + colWidths[0] + 2, y);
+        y += tableHeight;
+    });
+
+    // --- IMAGENS PROPORCIONAIS ---
+    y += 10;
+    const maxImgWidth = 80;
+    const maxImgHeight = 60;
+
+    async function addImage(base64, x, y, maxWidth, maxHeight) {
+        return new Promise(resolve => {
             const img = new Image();
+            img.onload = function() {
+                let ratio = img.width / img.height;
+                let width = maxWidth;
+                let height = maxHeight;
+                if(width/height > ratio) { width = height * ratio; } else { height = width / ratio; }
+                doc.addImage(base64, base64.startsWith('data:image/png') ? 'PNG' : 'JPEG', x, y, width, height);
+                resolve();
+            };
             img.src = base64;
-            const ratio = img.width / img.height;
-            let width = maxWidth;
-            let height = maxHeight;
-            if (width / height > ratio) { width = height * ratio; } else { height = width / ratio; }
-            doc.addImage(base64, 'JPEG', x, y, width, height);
-        }
-
-        if (y + maxImgHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
-        doc.setFontSize(10);
-        doc.text("Documento com Foto:", margin, y);
-        addImageProportional(documentoBase64, margin, y + 5, maxImgWidth, maxImgHeight);
-
-        doc.text("Comprovante de Residência:", pageWidth/2 + 10, y);
-        addImageProportional(comprovanteBase64, pageWidth/2 + 10, y + 5, maxImgWidth, maxImgHeight);
-
-        y += maxImgHeight + 20;
-
-        // --- ASSINATURAS ---
-        if (y + 60 > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
-        doc.setFontSize(fontSize);
-        doc.text("Local e Data: ___________________________", margin, y);
-        y += lineHeight*2;
-        doc.text("LOCADOR: ___________________________", margin, y);
-        y += lineHeight*2;
-        doc.text("LOCATÁRIO: ___________________________", margin, y);
-
-        addFooter();
-        doc.save('Contrato_Locacao_Premium.pdf');
+        });
     }
-    </script>
+
+    if(y + maxImgHeight > pageHeight - margin){ addFooter(); doc.addPage(); y = margin; }
+    doc.text("Documento com Foto:", margin, y);
+    await addImage(documentoBase64, margin, y + 5, maxImgWidth, maxImgHeight);
+
+    doc.text("Comprovante de Residência:", pageWidth/2 + 10, y);
+    await addImage(comprovanteBase64, pageWidth/2 + 10, y + 5, maxImgWidth, maxImgHeight);
+
+    y += maxImgHeight + 20;
+
+    // --- ASSINATURAS ---
+    if(y + 60 > pageHeight - margin){ addFooter(); doc.addPage(); y = margin; }
+    doc.text("Local e Data: ___________________________", margin, y);
+    y += lineHeight*2;
+    doc.text("LOCADOR: ___________________________", margin, y);
+    y += lineHeight*2;
+    doc.text("LOCATÁRIO: ___________________________", margin, y);
+
+    addFooter();
+    doc.save('Contrato_Locacao_Premium.pdf');
+}
+</script>
 </body>
 </html>
