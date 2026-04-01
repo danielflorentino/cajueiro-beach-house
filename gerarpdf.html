@@ -1,117 +1,37 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contrato de Locação por Temporada</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f7f7f7;
-        }
-        h1 {
-            text-align: center;
-        }
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 600px;
-            margin: auto;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        input[type="file"] {
-            padding: 3px;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 15px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-    <h1>Contrato de Locação por Temporada</h1>
+<script>
+async function gerarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-    <form id="rentalForm">
-        <label for="nome">Nome Completo do Locatário:</label>
-        <input type="text" id="nome" name="nome" required>
+    const nome = document.getElementById('nome').value;
+    const endereco = document.getElementById('endereco').value;
+    const telefone = document.getElementById('telefone').value;
+    const email = document.getElementById('email').value;
+    const checkin = document.getElementById('checkin').value;
+    const checkout = document.getElementById('checkout').value;
+    const documentoFile = document.getElementById('documento').files[0];
+    const comprovanteFile = document.getElementById('comprovante').files[0];
 
-        <label for="endereco">Endereço Residencial do Locatário:</label>
-        <input type="text" id="endereco" name="endereco" required>
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
 
-        <label for="telefone">Telefone:</label>
-        <input type="text" id="telefone" name="telefone" required>
+    const documentoBase64 = await fileToBase64(documentoFile);
+    const comprovanteBase64 = await fileToBase64(comprovanteFile);
 
-        <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required>
+    let y = 10;
+    const pageHeight = doc.internal.pageSize.height;
+    const lineHeight = 6;
+    const margin = 10;
 
-        <label for="checkin">Data de Check-in:</label>
-        <input type="date" id="checkin" name="checkin" required>
+    doc.setFontSize(12);
 
-        <label for="checkout">Data de Check-out:</label>
-        <input type="date" id="checkout" name="checkout" required>
-
-        <label for="documento">Documento com Foto (JPG/PNG):</label>
-        <input type="file" id="documento" name="documento" accept=".jpg, .jpeg, .png" required>
-
-        <label for="comprovante">Comprovante de Residência (JPG/PNG):</label>
-        <input type="file" id="comprovante" name="comprovante" accept=".jpg, .jpeg, .png" required>
-
-        <button type="button" onclick="gerarPDF()">Gerar Contrato em PDF</button>
-    </form>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
-        async function gerarPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            const nome = document.getElementById('nome').value;
-            const endereco = document.getElementById('endereco').value;
-            const telefone = document.getElementById('telefone').value;
-            const email = document.getElementById('email').value;
-            const checkin = document.getElementById('checkin').value;
-            const checkout = document.getElementById('checkout').value;
-            const documentoFile = document.getElementById('documento').files[0];
-            const comprovanteFile = document.getElementById('comprovante').files[0];
-
-            function fileToBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = error => reject(error);
-                });
-            }
-
-            const documentoBase64 = await fileToBase64(documentoFile);
-            const comprovanteBase64 = await fileToBase64(comprovanteFile);
-
-            let y = 10;
-            doc.setFontSize(12);
-
-            const contrato = `
+    const contrato = `
 CONTRATO DE LOCAÇÃO POR TEMPORADA
 
 LOCADOR(A): Daniel Florentino de Lima, CPF nº 103.393.774-61, residente em Rua Professora Anunciada da Rocha Melo, 57, Apt 201, Madalena, CEP: 50710-390, Recife-PE.
@@ -192,19 +112,32 @@ LOCADOR: ___________________________
 LOCATÁRIO: ___________________________
 `;
 
-            const lines = doc.splitTextToSize(contrato, 180);
-            doc.text(lines, 10, y);
-            y += lines.length * 6 + 10;
-
-            // Adicionar imagens dos arquivos
-            doc.setFontSize(10);
-            doc.text("Documento com Foto:", 10, y);
-            doc.addImage(documentoBase64, 'JPEG', 10, y + 5, 80, 60);
-            doc.text("Comprovante de Residência:", 100, y);
-            doc.addImage(comprovanteBase64, 'JPEG', 100, y + 5, 80, 60);
-
-            doc.save('Contrato_Locacao.pdf');
+    const lines = doc.splitTextToSize(contrato, 180);
+    for (let i = 0; i < lines.length; i++) {
+        if (y + lineHeight > pageHeight - margin) {
+            doc.addPage();
+            y = margin;
         }
-    </script>
-</body>
-</html>
+        doc.text(lines[i], 10, y);
+        y += lineHeight;
+    }
+
+    // Adicionar imagens dos arquivos com quebra de página se necessário
+    doc.setFontSize(10);
+    if (y + 65 > pageHeight - margin) { // 60 altura da imagem + 5 de margem
+        doc.addPage();
+        y = margin;
+    }
+    doc.text("Documento com Foto:", 10, y);
+    doc.addImage(documentoBase64, 'JPEG', 10, y + 5, 80, 60);
+
+    if (y + 65 > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+    }
+    doc.text("Comprovante de Residência:", 10, y + 70);
+    doc.addImage(comprovanteBase64, 'JPEG', 10, y + 75, 80, 60);
+
+    doc.save('Contrato_Locacao.pdf');
+}
+</script>
