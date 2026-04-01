@@ -67,7 +67,7 @@ async function gerarPDF() {
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     const margin = 15;
-    const lineHeight = 7; // aumenta espaçamento para maior elegância
+    const lineHeight = 7;
     let y = margin;
     let pageNum = 1;
     const fontSize = 12; 
@@ -80,7 +80,7 @@ async function gerarPDF() {
         doc.setLineWidth(0.5);
         doc.line(margin, 16, pageWidth - margin, 16);
         y = 25;
-        doc.setFontSize(fontSize); // padroniza fonte após cabeçalho
+        doc.setFontSize(fontSize);
         doc.setFont("helvetica", "normal");
     }
 
@@ -180,7 +180,6 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
 8.3 O descumprimento das cláusulas poderá implicar em cobranças adicionais, multas ou encerramento da locação.
 `;
 
-    // separa por parágrafo para espaçamento elegante
     contratoTexto.split("\n\n").forEach(paragrafo => {
         let lines = doc.splitTextToSize(paragrafo, pageWidth - 2*margin);
         lines.forEach(line => {
@@ -188,11 +187,14 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
             doc.text(line, margin, y);
             y += lineHeight;
         });
-        y += lineHeight; // espaçamento extra entre parágrafos
+        y += lineHeight;
     });
 
-    // --- TABELA DE ENXOVAL ---
+    // --- ANEXO: TABELA DE ENXOVAL ---
     y += 10;
+    doc.setFont("helvetica","bold");
+    doc.text("ANEXO I – Tabela de Reposição de Enxoval", margin, y);
+    y += lineHeight;
     const enxoval = [
         ["Item", "Valor (R$)"],
         ["Lençol de Cama (Com ou sem Elástico)", "50,00"],
@@ -206,8 +208,8 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
     const tableHeight = lineHeight + 2;
 
     doc.setFont("helvetica", "bold");
-    doc.setFillColor(200, 200, 200);
-    doc.rect(margin, y - 5, colWidths[0]+colWidths[1]+10, tableHeight, "F"); // cabeçalho
+    doc.setFillColor(220, 220, 220);
+    doc.rect(margin, y - 5, colWidths[0]+colWidths[1]+10, tableHeight, "F");
     doc.setTextColor(0,0,0);
     doc.text(enxoval[0][0], margin + 2, y);
     doc.text(enxoval[0][1], margin + colWidths[0] + 2, y);
@@ -224,7 +226,7 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
         y += tableHeight;
     }
 
-    // --- IMAGENS ---
+    // --- DOCUMENTOS ---
     y += 10;
     const maxImgWidth = 80;
     const maxImgHeight = 60;
@@ -251,9 +253,9 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
     await addImage(comprovanteBase64, pageWidth/2 + 10, y + 5, maxImgWidth, maxImgHeight);
     y += maxImgHeight + 20;
 
-    // --- ASSINATURAS ---
+    // --- ASSINATURAS COM LOCAL E DATA AUTOMÁTICOS ---
     checkPageSpace(60);
-    doc.text("Local e Data: ___________________________", margin, y);
+    doc.text(`Local e Data: Ipojuca-PE, ${dataGeracao}`, margin, y);
     y += lineHeight*2;
     doc.text("LOCADOR: ___________________________", margin, y);
     y += lineHeight*2;
