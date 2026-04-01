@@ -113,7 +113,7 @@
         const lineHeight = 6;
         let y = margin;
         let pageNum = 1;
-
+        const fontSize = 12; // Padroniza fonte
         const dataGeracao = new Date().toLocaleDateString('pt-BR');
 
         function addFooter() {
@@ -138,10 +138,10 @@
         doc.addPage();
         y = margin;
 
-        // --- TEXTO PRINCIPAL COM CLÁUSULAS ---
-        doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
+        doc.setFontSize(fontSize);
 
+        // --- TEXTO PRINCIPAL COM CLÁUSULAS ---
         const contratoTexto = `
 LOCADOR(A): Daniel Florentino de Lima, CPF nº 103.393.774-61, residente em Rua Professora Anunciada da Rocha Melo, 57, Apt 201, Madalena, CEP: 50710-390, Recife-PE.
 
@@ -179,11 +179,6 @@ CLÁUSULA 3 – LIMPEZA E ORGANIZAÇÃO
 CLÁUSULA 4 – DANOS AO IMÓVEL
 4.1 Qualquer dano ao imóvel, móveis ou eletrodomésticos deverá ser comunicado imediatamente ao LOCADOR.
 4.2 O LOCATÁRIO será responsável por ressarcir quaisquer danos causados durante sua estadia.
-
-CLÁUSULA 5 – USO DO ENXOVAL
-5.1 O LOCATÁRIO compromete-se a zelar pelo enxoval (roupas de cama e banho).
-5.2 Recomenda-se evitar o uso de toalhas e lençóis com resíduos de maquiagem, protetor solar, bronzeadores ou similares.
-5.3 Em caso de danos permanentes, extravio ou ausência, serão cobrados valores de reposição conforme tabela.
 `;
 
         let lines = doc.splitTextToSize(contratoTexto, pageWidth - 2*margin);
@@ -253,23 +248,34 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
             y += lineHeight;
         });
 
-        // --- IMAGENS ---
+        // --- IMAGENS PROPORCIONAIS ---
         y += 10;
-        const imageMaxHeight = 60;
-        const imageWidth = 80;
-        if (y + imageMaxHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
+        const maxImgWidth = 80;
+        const maxImgHeight = 60;
+
+        function addImageProportional(base64, x, y, maxWidth, maxHeight) {
+            const img = new Image();
+            img.src = base64;
+            const ratio = img.width / img.height;
+            let width = maxWidth;
+            let height = maxHeight;
+            if (width / height > ratio) { width = height * ratio; } else { height = width / ratio; }
+            doc.addImage(base64, 'JPEG', x, y, width, height);
+        }
+
+        if (y + maxImgHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
         doc.setFontSize(10);
         doc.text("Documento com Foto:", margin, y);
-        doc.addImage(documentoBase64, 'JPEG', margin, y + 5, imageWidth, imageMaxHeight);
+        addImageProportional(documentoBase64, margin, y + 5, maxImgWidth, maxImgHeight);
 
         doc.text("Comprovante de Residência:", pageWidth/2 + 10, y);
-        doc.addImage(comprovanteBase64, 'JPEG', pageWidth/2 + 10, y + 5, imageWidth, imageMaxHeight);
+        addImageProportional(comprovanteBase64, pageWidth/2 + 10, y + 5, maxImgWidth, maxImgHeight);
 
-        y += imageMaxHeight + 20;
+        y += maxImgHeight + 20;
 
         // --- ASSINATURAS ---
         if (y + 60 > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
-        doc.setFontSize(12);
+        doc.setFontSize(fontSize);
         doc.text("Local e Data: ___________________________", margin, y);
         y += lineHeight*2;
         doc.text("LOCADOR: ___________________________", margin, y);
