@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Contrato de Locação por Temporada</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px 0;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #contrato {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Preencha seus dados</h2>
+
+  <label>Nome:</label>
+  <input type="text" id="nome">
+
+  <label>Endereço:</label>
+  <input type="text" id="endereco">
+
+  <label>Telefone:</label>
+  <input type="text" id="telefone">
+
+  <button onclick="gerarContrato()">Gerar Contrato</button>
+
+  <div id="contrato">
+    <h2>Contrato de Locação por Temporada</h2>
+    <p>
+      Pelo presente instrumento particular, o LOCADOR disponibiliza o imóvel para locação por temporada ao LOCATÁRIO abaixo identificado:
+    </p>
+
+    <p><strong>Nome:</strong> <span id="c_nome"></span></p>
+    <p><strong>Endereço:</strong> <span id="c_endereco"></span></p>
+    <p><strong>Telefone:</strong> <span id="c_telefone"></span></p>
+
+    <p>
+      O presente contrato tem por objeto a locação por temporada, conforme legislação vigente, obrigando-se as partes ao seu fiel cumprimento.
+    </p>
+
+    <p>
+      O LOCATÁRIO declara estar ciente das regras do imóvel e se responsabiliza por eventuais danos causados durante a estadia.
+    </p>
+
+    <p>Data: ____/____/______</p>
+
+    <p>____________________________________<br>Assinatura do Locatário</p>
+  </div>
+
+  <button onclick="gerarPDF()">Baixar em PDF</button>
+
+  <script>
+    function gerarContrato() {
+      document.getElementById("c_nome").innerText = document.getElementById("nome").value;
+      document.getElementById("c_endereco").innerText = document.getElementById("endereco").value;
+      document.getElementById("c_telefone").innerText = document.getElementById("telefone").value;
+    }
+
+    function gerarPDF() {
+      const elemento = document.getElementById("contrato");
+      html2pdf().from(elemento).save("contrato_locacao.pdf");
+    }
+  </script>
+
+</body>
+</html>
