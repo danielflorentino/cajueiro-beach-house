@@ -16,7 +16,7 @@ button:hover { background-color: #0056b3; }
 </style>
 </head>
 <body>
-<h1>Contrato de Locação - Cajueiro Beach House - ok </h1>
+<h1>Contrato de Locação - Cajueiro Beach House </h1>
 <form id="rentalForm">
     <label for="nome">Nome Completo do Locatário:</label>
     <input type="text" id="nome" name="nome" required>
@@ -67,17 +67,36 @@ async function gerarPDF() {
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     const margin = 15;
-    const lineHeight = 6;
+    const lineHeight = 7; // aumenta espaçamento para maior elegância
     let y = margin;
     let pageNum = 1;
     const fontSize = 12; 
     const dataGeracao = new Date().toLocaleDateString('pt-BR');
+
+    function addHeader() {
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text("Cajueiro Beach House", pageWidth/2, 12, {align: "center"});
+        doc.setLineWidth(0.5);
+        doc.line(margin, 16, pageWidth - margin, 16);
+        y = 25;
+        doc.setFontSize(fontSize); // padroniza fonte após cabeçalho
+        doc.setFont("helvetica", "normal");
+    }
 
     function addFooter() {
         doc.setFontSize(10);
         doc.setFont("helvetica", "italic");
         doc.text(`Página ${pageNum} - Gerado em ${dataGeracao}`, pageWidth - margin, pageHeight - 10, {align: 'right'});
         pageNum++;
+    }
+
+    function checkPageSpace(additionalHeight = 0) {
+        if(y + additionalHeight > pageHeight - margin) {
+            addFooter();
+            doc.addPage();
+            addHeader();
+        }
     }
 
     // --- CAPA ---
@@ -93,12 +112,9 @@ async function gerarPDF() {
     doc.text("Cajueiro Beach House", pageWidth/2, pageHeight/2, {align: "center"});
     addFooter();
     doc.addPage();
-    y = margin;
+    addHeader();
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(fontSize);
-
-    // --- TEXTO COMPLETO DO CONTRATO ---
+    // --- TEXTO DO CONTRATO ---
     const contratoTexto = `
 LOCADOR(A): Daniel Florentino de Lima, CPF nº 103.393.774-61, residente em Rua Professora Anunciada da Rocha Melo, 57, Apt 201, Madalena, CEP: 50710-390, Recife-PE.
 
@@ -164,14 +180,18 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
 8.3 O descumprimento das cláusulas poderá implicar em cobranças adicionais, multas ou encerramento da locação.
 `;
 
-    let contratoLines = doc.splitTextToSize(contratoTexto, pageWidth - 2*margin);
-    contratoLines.forEach(line => {
-        if(y + lineHeight > pageHeight - margin){ addFooter(); doc.addPage(); y = margin; }
-        doc.text(line, margin, y);
-        y += lineHeight;
+    // separa por parágrafo para espaçamento elegante
+    contratoTexto.split("\n\n").forEach(paragrafo => {
+        let lines = doc.splitTextToSize(paragrafo, pageWidth - 2*margin);
+        lines.forEach(line => {
+            checkPageSpace(lineHeight);
+            doc.text(line, margin, y);
+            y += lineHeight;
+        });
+        y += lineHeight; // espaçamento extra entre parágrafos
     });
 
-    // --- TABELA DE ENXOVAL ESTILIZADA ---
+    // --- TABELA DE ENXOVAL ---
     y += 10;
     const enxoval = [
         ["Item", "Valor (R$)"],
@@ -182,31 +202,29 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
         ["Toalha de Piso", "30,00"],
         ["Chave/Tag", "150,00"]
     ];
-
     const colWidths = [120, 40];
-    const tableHeight = lineHeight;
+    const tableHeight = lineHeight + 2;
 
     doc.setFont("helvetica", "bold");
-    doc.text("Tabela de Reposição de Enxoval", margin, y);
-    y += lineHeight;
+    doc.setFillColor(200, 200, 200);
+    doc.rect(margin, y - 5, colWidths[0]+colWidths[1]+10, tableHeight, "F"); // cabeçalho
+    doc.setTextColor(0,0,0);
+    doc.text(enxoval[0][0], margin + 2, y);
+    doc.text(enxoval[0][1], margin + colWidths[0] + 2, y);
+    y += tableHeight;
     doc.setFont("helvetica", "normal");
 
-    // Desenha a tabela
-    enxoval.forEach((row, rowIndex) => {
-        if(y + tableHeight > pageHeight - margin){ addFooter(); doc.addPage(); y = margin; }
-        // Linha da tabela
-        doc.rect(margin, y - 4, colWidths[0]+colWidths[1]+10, tableHeight); 
-        // Colunas
-        doc.rect(margin, y - 4, colWidths[0], tableHeight);
-        doc.rect(margin + colWidths[0], y - 4, colWidths[1], tableHeight);
-
-        // Texto das células
-        doc.text(row[0], margin + 2, y);
-        doc.text(row[1], margin + colWidths[0] + 2, y);
+    for(let i=1;i<enxoval.length;i++){
+        checkPageSpace(tableHeight);
+        doc.rect(margin, y - 5, colWidths[0]+colWidths[1]+10, tableHeight);
+        doc.rect(margin, y - 5, colWidths[0], tableHeight);
+        doc.rect(margin + colWidths[0], y - 5, colWidths[1], tableHeight);
+        doc.text(enxoval[i][0], margin + 2, y);
+        doc.text(enxoval[i][1], margin + colWidths[0] + 2, y);
         y += tableHeight;
-    });
+    }
 
-    // --- IMAGENS PROPORCIONAIS ---
+    // --- IMAGENS ---
     y += 10;
     const maxImgWidth = 80;
     const maxImgHeight = 60;
@@ -226,17 +244,15 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
         });
     }
 
-    if(y + maxImgHeight > pageHeight - margin){ addFooter(); doc.addPage(); y = margin; }
+    checkPageSpace(maxImgHeight + 10);
     doc.text("Documento com Foto:", margin, y);
     await addImage(documentoBase64, margin, y + 5, maxImgWidth, maxImgHeight);
-
     doc.text("Comprovante de Residência:", pageWidth/2 + 10, y);
     await addImage(comprovanteBase64, pageWidth/2 + 10, y + 5, maxImgWidth, maxImgHeight);
-
     y += maxImgHeight + 20;
 
     // --- ASSINATURAS ---
-    if(y + 60 > pageHeight - margin){ addFooter(); doc.addPage(); y = margin; }
+    checkPageSpace(60);
     doc.text("Local e Data: ___________________________", margin, y);
     y += lineHeight*2;
     doc.text("LOCADOR: ___________________________", margin, y);
