@@ -242,12 +242,14 @@ CLÁUSULA 8 – DISPOSIÇÕES GERAIS
 8.3 O descumprimento das cláusulas poderá implicar em cobranças adicionais, multas ou encerramento da locação.
 `;
 
-        lines = doc.splitTextToSize(clausulasFinais, pageWidth - 2*margin);
+
+let lines = doc.splitTextToSize(clausulasFinais, pageWidth - 2*margin);
         lines.forEach(line => {
             if (y + lineHeight > pageHeight - margin) { addFooter(); doc.addPage(); y = margin; }
             doc.text(line, margin, y);
             y += lineHeight;
         });
+
 
         // --- IMAGENS PROPORCIONAIS ---
         y += 10;
